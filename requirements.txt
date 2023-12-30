@@ -1,0 +1,17 @@
+wheel==0.42.0
+setuptools==69.0.3
+twine==4.0.2
+build==1.0.3
+html-testRunner~=1.2.1
+mypy==1.8.0
+
+mypy-extensions==1.0.0
+types-setuptools==69.0.0.0
+typing_extensions==4.9.0
+
+buildlackey==1.6.2
+codeallybasic==0.5.2
+
+pipdeptree==2.13.1
+dataclass-wizard==0.22.2
+wxPython==4.2.1
