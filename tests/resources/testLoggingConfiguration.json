@@ -1,0 +1,48 @@
+{
+    "version": 1,
+    "disable_existing_loggers": "False",
+    "formatters": {
+        "simple": {
+            "format": "%(asctime)s.%(msecs)03d %(levelname)s %(module)s: %(message)s"
+        },
+        "testSimple": {
+            "format": "%(levelname)s: %(module)s: %(message)s"
+        },
+        "functionNames": {
+            "format": "%(asctime)s.%(msecs)03d %(levelname)s %(module)s.%(funcName)s() %(message)s",
+            "datefmt" : "%H:%M:%S"
+        },
+        "favoriteTime": {
+            "format": "%(asctime)s.%(msecs)03d %(levelname)s %(module)s: %(message)s",
+            "datefmt": "%0H%0M%0S"
+        }
+
+    },
+    "handlers": {
+        "consoleHandler": {
+            "class": "logging.StreamHandler",
+            "formatter": "favoriteTime",
+            "stream": "ext://sys.stdout"
+        }
+    },
+    "loggers": {
+        "root": {
+            "level": "WARNING",
+            "handlers": ["consoleHandler"],
+            "propagate": "False"
+        },
+        "__main__": {
+            "level": "INFO",
+            "propagate": "False"
+        },
+        "vpipdeptree": {
+            "level":     "WARNING",
+            "propagate": "False"
+        },
+        "codeallybasic.UnitTestBase": {
+            "level":     "INFO",
+            "propagate": "False"
+        }
+
+    }
+}

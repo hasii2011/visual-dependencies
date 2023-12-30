@@ -1,0 +1,64 @@
+{
+    "version": 1,
+    "disable_existing_loggers": "False",
+    "formatters": {
+        "simple": {
+            "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        },
+        "pyutSimple": {
+            "format": "%(asctime)s.%(msecs)03d %(levelname)s %(module)s: %(message)s",
+            "datefmt" : "%H:%M:%S"
+        },
+         "functionNames": {
+            "format": "%(asctime)s.%(msecs)03d %(levelname)s %(module)s.%(funcName)s() %(message)s",
+            "datefmt" : "%H:%M:%S"
+        },
+        "favoriteTime": {
+            "format": "%(asctime)s.%(msecs)03d %(levelname)s %(module)s: %(message)s",
+            "datefmt": "%0H%0M%0S"
+        }
+
+    },
+    "handlers": {
+        "consoleHandler": {
+            "class":     "logging.StreamHandler",
+            "formatter": "favoriteTime",
+            "stream":     "ext://sys.stdout"
+        },
+        "consoleHandlerFunctionNames": {
+            "class": "logging.StreamHandler",
+            "formatter": "functionNames",
+            "stream": "ext://sys.stdout"
+        },
+        "consoleHandlerFavoriteTime": {
+            "class": "logging.StreamHandler",
+            "formatter": "favoriteTime",
+            "stream": "ext://sys.stdout"
+        },
+
+        "rotatingFileHandler": {
+            "class": "logging.handlers.logging.handlers.RotatingFileHandler",
+            "formatter": "pyutSimple",
+            "filename": "/tmp/pyut.log",
+            "mode": "a",
+            "maxBytes": 81920,
+            "backupCount": 5,
+            "encoding": "utf-8"
+        }
+    },
+    "loggers": {
+        "root": {
+            "level":     "WARNING",
+            "handlers":  ["consoleHandlerFunctionNames"],
+            "propagate": "False"
+        },
+        "visualdependencies": {
+            "level":     "WARNING",
+            "propagate": "False"
+        },
+        "visualdependencies.DependencyDataViewModel": {
+            "level":     "INFO",
+            "propagate": "False"
+        }
+    }
+}
