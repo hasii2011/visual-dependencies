@@ -4,6 +4,7 @@ from setuptools import setup
 import pathlib
 
 from visualdependencies import __version__
+from visualdependencies import __applicationName__
 
 # The directory containing this file
 HERE = pathlib.Path(__file__).parent
@@ -20,13 +21,13 @@ README = (HERE / "README.md").read_text()
 LICENSE = (HERE / 'LICENSE').read_text()
 
 setup(
-    name='VisualDependencies',
+    name=__applicationName__,
     version=__version__,
     app=APP,
     data_files=DATA_FILES,
     packages=['visualdependencies',
+              'visualdependencies.futures',
               'visualdependencies.model',
-              'visualdependencies.resources',
               'visualdependencies.resources.images',
               ],
     include_package_data=True,

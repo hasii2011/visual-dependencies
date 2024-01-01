@@ -31,6 +31,7 @@ from wx.dataview import TreeListItem
 from visualdependencies.CLIAdapter import CLIAdapter
 from visualdependencies.CLIAdapter import PackageNames
 from visualdependencies.EnhancedImageList import EnhancedImageList
+from visualdependencies.Preferences import Preferences
 from visualdependencies.model.Types import Dependency
 from visualdependencies.model.Types import Package
 
@@ -58,11 +59,12 @@ class Mediator:
         self._treeRoot:          TreeListItem      = treeRoot
         self._enhancedImageList: EnhancedImageList = enhancedImageList
 
-        self._cliAdapter: CLIAdapter = CLIAdapter()
+        self._cliAdapter:  CLIAdapter  = CLIAdapter()
+        self._preferences: Preferences = Preferences()
 
     def selectVirtualEnvironment(self):
 
-        startDirectory: str = ''    # TODO  this is a preference
+        startDirectory: str = self._preferences.projectsBaseDirectory
 
         response: InterpreterRequestResponse = self._askForPythonInterpreter(startDirectory=startDirectory)
         if response.cancelled is True:
@@ -72,9 +74,9 @@ class Mediator:
             self._cliAdapter.execute(packageNames=PackageNames([]), interpreter=interpreter)
 
             container: Container = Package.from_json(self._cliAdapter.json)
-            self.populateTree(container=container)
+            self._displayDependencies(container=container)
 
-    def populateTree(self, container: Container):
+    def _displayDependencies(self, container: Container):
 
         tree: TreeListCtrl = self.treeListCtrl
         root: TreeListItem = self._treeRoot
@@ -100,14 +102,15 @@ class Mediator:
                 tree.SetItemText(depItem, dependency.requiredVersion, 2)
 
                 # tree.SetItemImage(depItem, enhancedImageList.fileIndex,       which=TreeItemIcon_Normal)
-                tree.SetItemImage(depItem, enhancedImageList.folderOpenIndex, which=TreeItemIcon_Expanded)
+                # tree.SetItemImage(depItem, enhancedImageList.folderOpenIndex, which=TreeItemIcon_Expanded)
 
             # if len(package.dependencies) == 0:
             #     tree.SetItemImage(pkgItem, enhancedImageList.fileIndex, which=TreeItemIcon_Normal)
-            # TODO: preference
-            # tree.Expand(pkgItem)
-        # TODO: preference
-        # tree.Expand(root)
+            if self._preferences.expandDependencies is True:
+                tree.Expand(pkgItem)
+
+        if self._preferences.openProject is True:
+            tree.Expand(root)
 
     def _askForPythonInterpreter(self, startDirectory: str) -> InterpreterRequestResponse:
         """

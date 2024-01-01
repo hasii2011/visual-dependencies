@@ -7,7 +7,7 @@ __pycache__
 /dist/
 /pyenv-3.11.7/
 /archive/
-/vpipdeptree.egg-info
+VisualDependencies.egg-info
 /.eggs
 .envrc
 *.pyc

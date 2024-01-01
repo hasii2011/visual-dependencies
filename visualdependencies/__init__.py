@@ -1,1 +1,2 @@
 from visualdependencies._version import __version__
+from visualdependencies._applicationName import __applicationName__
