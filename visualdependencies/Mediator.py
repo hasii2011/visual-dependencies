@@ -4,19 +4,44 @@ from typing import cast
 from logging import Logger
 from logging import getLogger
 
+from os import getcwd
+
+from pathlib import Path
+
+from dataclasses import dataclass
+
+from dataclass_wizard import Container
+
+from wx import FD_CHANGE_DIR
+from wx import FD_FILE_MUST_EXIST
+from wx import FD_NO_FOLLOW
+from wx import FD_OPEN
+from wx import ICON_ERROR
 from wx import TreeItemIcon_Expanded
 from wx import TreeItemIcon_Normal
+from wx import OK
+
+from wx import FileSelector
+from wx import MessageDialog
 
 from wx.lib.gizmos import TreeListCtrl
 from wx.dataview import TreeListItem
 
-from dataclass_wizard import Container
 
 from visualdependencies.CLIAdapter import CLIAdapter
 from visualdependencies.CLIAdapter import PackageNames
 from visualdependencies.EnhancedImageList import EnhancedImageList
 from visualdependencies.model.Types import Dependency
 from visualdependencies.model.Types import Package
+
+
+@dataclass
+class InterpreterRequestResponse:
+    cancelled:       bool = False
+    interpreterName: str  = ''
+
+
+PYTHON_INTERPRETER: str = 'python*'
 
 
 class Mediator:
@@ -33,19 +58,30 @@ class Mediator:
         self._treeRoot:          TreeListItem      = treeRoot
         self._enhancedImageList: EnhancedImageList = enhancedImageList
 
-        cliAdapter: CLIAdapter = CLIAdapter()
-        cliAdapter.execute(packageNames=PackageNames([]))
+        self._cliAdapter: CLIAdapter = CLIAdapter()
 
-        self._container: Container = Package.from_json(cliAdapter.json)
+    def selectVirtualEnvironment(self):
 
-    def populateTree(self):
+        startDirectory: str = ''    # TODO  this is a preference
+
+        response: InterpreterRequestResponse = self._askForPythonInterpreter(startDirectory=startDirectory)
+        if response.cancelled is True:
+            pass        # Now what
+        else:
+            interpreter: str = response.interpreterName
+            self._cliAdapter.execute(packageNames=PackageNames([]), interpreter=interpreter)
+
+            container: Container = Package.from_json(self._cliAdapter.json)
+            self.populateTree(container=container)
+
+    def populateTree(self, container: Container):
 
         tree: TreeListCtrl = self.treeListCtrl
         root: TreeListItem = self._treeRoot
 
         enhancedImageList: EnhancedImageList = self._enhancedImageList
 
-        for pkg in self._container:
+        for pkg in container:
             package: Package      = cast(Package, pkg)
             pkgItem: TreeListItem = tree.AppendItem(root, package.package.packageName)
 
@@ -68,7 +104,64 @@ class Mediator:
 
             # if len(package.dependencies) == 0:
             #     tree.SetItemImage(pkgItem, enhancedImageList.fileIndex, which=TreeItemIcon_Normal)
-
+            # TODO: preference
             # tree.Expand(pkgItem)
-
+        # TODO: preference
         # tree.Expand(root)
+
+    def _askForPythonInterpreter(self, startDirectory: str) -> InterpreterRequestResponse:
+        """
+        Called by plugin to ask for a file to import
+
+        Args:
+            startDirectory: The directory to display
+
+        Returns:  The request response
+        """
+        defaultDir: str = startDirectory
+
+        if defaultDir is None:
+            defaultDir = getcwd()
+        while True:
+            file = FileSelector(
+                message="Choose a virtual environment",
+                default_path=defaultDir,
+                flags=FD_OPEN | FD_FILE_MUST_EXIST | FD_CHANGE_DIR | FD_NO_FOLLOW
+            )
+
+            response: InterpreterRequestResponse = InterpreterRequestResponse()
+            if file == '':
+                response.cancelled = True
+                response.interpreterName  = ''
+                break
+            else:
+                if self._isItAnInterpreter(file) is True:
+                    response.cancelled = False
+                    response.interpreterName = file
+                    break
+                else:
+                    self._admonishDeveloper()
+
+        return response
+
+    def _isItAnInterpreter(self, fqFileName: str) -> bool:
+        import fnmatch
+
+        ans:      bool = False
+        path:     Path = Path(fqFileName)
+        fileName: str = path.name
+
+        if fnmatch.fnmatch(name=fileName, pat=PYTHON_INTERPRETER) is True:
+            ans = True
+
+        return ans
+
+    def _admonishDeveloper(self):
+        """
+        I wish I could ask the file selector to let me specify a file like
+        PYTHON_INTERPRETER
+        """
+        booBoo: MessageDialog = MessageDialog(parent=None, message='You must select an interpreter',
+                                              caption='Try Again!',
+                                              style=OK | ICON_ERROR)
+        booBoo.ShowModal()

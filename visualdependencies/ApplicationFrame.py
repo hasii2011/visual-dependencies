@@ -7,11 +7,18 @@ from logging import getLogger
 
 from os import getenv as osGetEnv
 
+from wx import CommandEvent
 from wx import DEFAULT_FRAME_STYLE
+from wx import EVT_MENU
 from wx import FRAME_EX_METAL
 from wx import FRAME_FLOAT_ON_PARENT
 from wx import FRAME_TOOL_WINDOW
+from wx import ID_ABOUT
 from wx import ID_ANY
+from wx import ID_EXIT
+from wx import ID_PREFERENCES
+from wx import Menu
+from wx import MenuBar
 
 from wx import TreeItemIcon_Expanded
 from wx import TreeItemIcon_Normal
@@ -53,6 +60,9 @@ class ApplicationFrame (SizedFrame):
         super().__init__(parent=None, id=ID_ANY, title="Visual Dependencies", size=(600, 400), style=frameStyle)
 
         self.SetBackgroundColour(Colour(204, 229, 255))
+
+        self._createApplicationMenuBar()
+
         self._treeRoot:          TreeListItem      = cast(TreeListItem, None)
         self._enhancedImageList: EnhancedImageList = cast(EnhancedImageList, None)
 
@@ -60,7 +70,12 @@ class ApplicationFrame (SizedFrame):
 
         self._mediator: Mediator = Mediator(treeListCtrl=self._treeListCtrl, treeRoot=self._treeRoot, enhancedImageList=self._enhancedImageList)
 
-        self._mediator.populateTree()
+        # self._mediator.populateTree()
+        self._mediator.selectVirtualEnvironment()
+
+    # noinspection PyUnusedLocal
+    def Close(self, force=False):
+        self.Destroy()
 
     def _makeTree(self) -> TreeListCtrl:
 
@@ -109,3 +124,37 @@ class ApplicationFrame (SizedFrame):
         except (ValueError, Exception) as e:
             print(f'secureBoolean error: {e}')
         return False
+
+    def _createApplicationMenuBar(self):
+
+        menuBar:  MenuBar = MenuBar()
+        fileMenu: Menu = Menu()
+        helpMenu: Menu = Menu()
+
+        fileMenu.Append(ID_PREFERENCES, 'Preferences', 'Make Preferences')
+
+        fileMenu.AppendSeparator()
+        fileMenu.Append(ID_EXIT, '&Quit', "Quit Application")
+
+        helpMenu.AppendSeparator()
+        helpMenu.Append(ID_ABOUT, '&About', 'Tell you about me')
+
+        menuBar.Append(fileMenu, 'File')
+        menuBar.Append(helpMenu, 'Help')
+
+        self.SetMenuBar(menuBar)
+        self.Bind(EVT_MENU, self._onAbout,       id=ID_ABOUT)
+        self.Bind(EVT_MENU, self._onPreferences, id=ID_PREFERENCES)
+
+        self.Bind(EVT_MENU, self.Close,        id=ID_EXIT)
+
+    # noinspection PyUnusedLocal
+    def _onAbout(self, event: CommandEvent):
+
+        pass
+        # dlg: DlgAbout = DlgAbout(parent=self)
+        # dlg.ShowModal()
+
+    # noinspection PyUnusedLocal
+    def _onPreferences(self, event: CommandEvent):
+        pass

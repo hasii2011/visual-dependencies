@@ -100,7 +100,7 @@ class TestCLIAdapter(UnitTestBase):
 
         adapter: CLIAdapter = CLIAdapter()
 
-        actualOption:   str = adapter._buildPackageNameOption(packageNames=self._packageNames)
+        actualOption:   str = adapter._buildPackageNameOption(packageNames=self._packageNames, interpreter='')
         expectedOption: str = f'{CLIAdapter.PACKNAME_OPTION} {NAME_1},{NAME_2},{NAME_3}'
         self.assertEqual(expectedOption, actualOption, 'Option not correctly built')
 

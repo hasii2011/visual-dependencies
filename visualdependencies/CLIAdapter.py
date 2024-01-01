@@ -26,6 +26,7 @@ class CLIAdapter:
     """
     BASIC_COMMAND:   str = 'pipdeptree --json '
     PACKNAME_OPTION: str = '--packages '
+    PYTHON_OPTION:   str = '--python  '
 
     def __init__(self):
         self.logger: Logger = getLogger(__name__)
@@ -33,17 +34,18 @@ class CLIAdapter:
         self._json:   str = ''
         self._stderr: str = ''
 
-    def execute(self, packageNames: PackageNames):
+    def execute(self, packageNames: PackageNames, interpreter: str = ''):
         """
         If this executes successfully, query the json property to retrieve the
         output
         Args:
+            interpreter:    Fully qualified name of the interpreter
             packageNames:   Specify an empty list if you want all
 
         Returns:  The status of the command
         """
 
-        status: int = self._runCommand(packageNames=packageNames)
+        status: int = self._runCommand(packageNames=packageNames, interpreter=interpreter)
         if status != 0:
             raise CLIException(f'Command failed {status}')
 
@@ -55,17 +57,19 @@ class CLIAdapter:
     def stderr(self) -> str:
         return self._stderr
 
-    def _runCommand(self, packageNames: PackageNames) -> int:
+    def _runCommand(self, packageNames: PackageNames, interpreter: str) -> int:
         """
         If this completes w/o an error it stashes the CLI output in self._json
         If there is an error this method populates self._stderr
         Args:
             packageNames:  List of package names to query
+            interpreter:   Fully qualified name of the interpreter
+
 
         Returns:  The status code of the executed command
         """
 
-        optionStr: str = self._buildPackageNameOption(packageNames=packageNames)
+        optionStr: str = self._buildPackageNameOption(packageNames=packageNames, interpreter=interpreter)
         command:   str = f'{CLIAdapter.BASIC_COMMAND} {optionStr}'
 
         completedProcess: CompletedProcess = subProcessRun([command], shell=True, capture_output=True, text=True, check=False)
@@ -77,7 +81,7 @@ class CLIAdapter:
 
         return completedProcess.returncode
 
-    def _buildPackageNameOption(self, packageNames: PackageNames) -> str:
+    def _buildPackageNameOption(self, packageNames: PackageNames, interpreter: str) -> str:
         """
         Build up a string of package names
         Args:
@@ -96,6 +100,11 @@ class CLIAdapter:
             pass
         else:
             optionString = f'{CLIAdapter.PACKNAME_OPTION} {optionString}'
+        optionString = optionString.strip(',')
+
+        if interpreter != '':
+            optionString = f'{optionString} {CLIAdapter.PYTHON_OPTION} {interpreter}'
+
         return optionString.strip(',')
 
     @classmethod
