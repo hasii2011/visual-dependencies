@@ -58,14 +58,9 @@ class VisualDependencies(App):
 
         self._frame = ApplicationFrame()
 
-        self._frame.Show(False)
-
         self.SetTopWindow(self._frame)
 
-        mainSizer: BoxSizer = self._frame.GetContainingSizer()
-
         self._frame.SetAutoLayout(True)
-        self._frame.SetSizer(mainSizer)
         self._frame.Show(True)
 
         self._showSplash()

@@ -26,6 +26,7 @@ setup(
     app=APP,
     data_files=DATA_FILES,
     packages=['visualdependencies',
+              'visualdependencies.dialogs',
               'visualdependencies.futures',
               'visualdependencies.model',
               'visualdependencies.resources.images',

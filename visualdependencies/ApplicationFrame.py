@@ -16,6 +16,7 @@ from wx import FRAME_TOOL_WINDOW
 from wx import ID_ABOUT
 from wx import ID_ANY
 from wx import ID_EXIT
+from wx import ID_OK
 from wx import ID_PREFERENCES
 from wx import Menu
 from wx import MenuBar
@@ -37,6 +38,7 @@ from wx.lib.sized_controls import SizedPanel
 
 from visualdependencies.EnhancedImageList import EnhancedImageList
 from visualdependencies.Mediator import Mediator
+from visualdependencies.dialogs.PreferencesDialog import PreferencesDialog
 
 
 class ApplicationFrame (SizedFrame):
@@ -157,4 +159,10 @@ class ApplicationFrame (SizedFrame):
 
     # noinspection PyUnusedLocal
     def _onPreferences(self, event: CommandEvent):
-        pass
+
+        with PreferencesDialog(self) as dlg:
+
+            if dlg.ShowModal() == ID_OK:
+                self.logger.debug(f'Waiting for answer')
+            else:
+                self.logger.debug(f'Cancelled')

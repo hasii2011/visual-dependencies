@@ -72,6 +72,7 @@ class Preferences:
     @expandDependencies.setter
     def expandDependencies(self, newValue: bool):
         self._config.set(section=PREFERENCES_SECTION, option=EXPAND_DEPENDENCIES, value=str(newValue))
+        self._savePreferences()
 
     def _loadPreferences(self):
 
