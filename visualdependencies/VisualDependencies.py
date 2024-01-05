@@ -10,7 +10,7 @@ from os import sep as osSep
 from json import load as jsonLoad
 
 from wx import App
-from wx import BITMAP_TYPE_JPEG
+from wx import BITMAP_TYPE_PNG
 from wx import BLACK
 from wx import Bitmap
 from wx import BoxSizer
@@ -37,10 +37,12 @@ class VisualDependencies(App):
     # noinspection SpellCheckingInspection
     RESOURCES_PACKAGE_NAME:       str = 'visualdependencies.resources'
     RESOURCES_IMAGE_PACKAGE_NAME: str = f'{RESOURCES_PACKAGE_NAME}.images'
+    RESOURCES_ICON_PACKAGE_NAME:  str = f'{RESOURCES_PACKAGE_NAME}.icons'
 
     # noinspection SpellCheckingInspection
     RESOURCES_PATH:       str = f'visualdependencies{osSep}resources'
     RESOURCES_IMAGE_PATH: str = f'{RESOURCES_PATH}{osSep}images'
+    RESOURCES_ICONS_PATH: str = f'{RESOURCES_PATH}{osSep}icons'
 
     JSON_LOGGING_CONFIG_FILENAME: str = "loggingConfiguration.json"
 
@@ -91,10 +93,10 @@ class VisualDependencies(App):
 
     def _showSplash(self):
 
-        fqFileName: str = ResourceManager.retrieveResourcePath(bareFileName='DependencySplash.jpg',
-                                                               resourcePath=VisualDependencies.RESOURCES_IMAGE_PATH,
-                                                               packageName=VisualDependencies.RESOURCES_IMAGE_PACKAGE_NAME)
-        splashBitmap: Bitmap = Bitmap(name=fqFileName, type=BITMAP_TYPE_JPEG)
+        fqFileName: str = ResourceManager.retrieveResourcePath(bareFileName='dependencies-128x128.png',
+                                                               resourcePath=VisualDependencies.RESOURCES_ICONS_PATH,
+                                                               packageName=VisualDependencies.RESOURCES_ICON_PACKAGE_NAME)
+        splashBitmap: Bitmap = Bitmap(name=fqFileName, type=BITMAP_TYPE_PNG)
         shadow:       Colour = BLACK
         agwStyle:     int    = AS_TIMEOUT | AS_CENTER_ON_PARENT | AS_SHADOW_BITMAP
 
