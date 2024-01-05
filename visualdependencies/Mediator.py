@@ -27,9 +27,10 @@ from wx import MessageDialog
 from wx.lib.gizmos import TreeListCtrl
 from wx.dataview import TreeListItem
 
-
 from visualdependencies.CLIAdapter import CLIAdapter
+from visualdependencies.CLIAdapter import CLIException
 from visualdependencies.CLIAdapter import PackageNames
+
 from visualdependencies.EnhancedImageList import EnhancedImageList
 from visualdependencies.Preferences import Preferences
 from visualdependencies.model.Types import Dependency
@@ -71,7 +72,14 @@ class Mediator:
             pass        # Now what
         else:
             interpreter: str = response.interpreterName
-            self._cliAdapter.execute(packageNames=PackageNames([]), interpreter=interpreter)
+            try:
+                self._cliAdapter.execute(packageNames=PackageNames([]), interpreter=interpreter)
+            except CLIException as ce:
+                self.logger.error(f'{ce}  {self._cliAdapter.stderr}')
+                booBoo: MessageDialog = MessageDialog(parent=None,
+                                                      message=self._cliAdapter.stderr,
+                                                      caption='Oops', style=OK | ICON_ERROR)
+                booBoo.ShowModal()
 
             container: Container = Package.from_json(self._cliAdapter.json)
             self._displayDependencies(container=container)

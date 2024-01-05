@@ -38,6 +38,7 @@ from wx.lib.sized_controls import SizedPanel
 
 from visualdependencies.EnhancedImageList import EnhancedImageList
 from visualdependencies.Mediator import Mediator
+from visualdependencies.dialogs.AboutDialog import AboutDialog
 from visualdependencies.dialogs.PreferencesDialog import PreferencesDialog
 
 
@@ -72,7 +73,6 @@ class ApplicationFrame (SizedFrame):
 
         self._mediator: Mediator = Mediator(treeListCtrl=self._treeListCtrl, treeRoot=self._treeRoot, enhancedImageList=self._enhancedImageList)
 
-        # self._mediator.populateTree()
         self._mediator.selectVirtualEnvironment()
 
     # noinspection PyUnusedLocal
@@ -153,9 +153,8 @@ class ApplicationFrame (SizedFrame):
     # noinspection PyUnusedLocal
     def _onAbout(self, event: CommandEvent):
 
-        pass
-        # dlg: DlgAbout = DlgAbout(parent=self)
-        # dlg.ShowModal()
+        with AboutDialog(self) as dlg:
+            dlg.ShowModal()
 
     # noinspection PyUnusedLocal
     def _onPreferences(self, event: CommandEvent):

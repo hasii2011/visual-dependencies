@@ -25,6 +25,7 @@ from wx.lib.agw.advancedsplash import AdvancedSplash
 from codeallybasic.ResourceManager import ResourceManager
 
 from visualdependencies.ApplicationFrame import ApplicationFrame
+from visualdependencies.resources.icons import AboutDialogImage
 
 
 class VisualDependencies(App):
@@ -93,10 +94,7 @@ class VisualDependencies(App):
 
     def _showSplash(self):
 
-        fqFileName: str = ResourceManager.retrieveResourcePath(bareFileName='dependencies-128x128.png',
-                                                               resourcePath=VisualDependencies.RESOURCES_ICONS_PATH,
-                                                               packageName=VisualDependencies.RESOURCES_ICON_PACKAGE_NAME)
-        splashBitmap: Bitmap = Bitmap(name=fqFileName, type=BITMAP_TYPE_PNG)
+        splashBitmap: Bitmap = AboutDialogImage.embeddedImage.GetBitmap()
         shadow:       Colour = BLACK
         agwStyle:     int    = AS_TIMEOUT | AS_CENTER_ON_PARENT | AS_SHADOW_BITMAP
 

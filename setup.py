@@ -10,8 +10,7 @@ from visualdependencies import __applicationName__
 HERE = pathlib.Path(__file__).parent
 
 APP = ['visualdependencies/VisualDependencies.py']
-DATA_FILES = [('visualdependencies/resources', ['visualdependencies/resources/loggingConfiguration.json']),
-              ('visualdependencies/resources/images', ['visualdependencies/resources/images/DependencySplash.jpg']),
+DATA_FILES = [('visualdependencies/resources',       ['visualdependencies/resources/loggingConfiguration.json']),
               ]
 OPTIONS = {}
 SRC_DIR = 'src'
@@ -29,6 +28,7 @@ setup(
               'visualdependencies.dialogs',
               'visualdependencies.futures',
               'visualdependencies.model',
+              'visualdependencies.resources.icons',
               'visualdependencies.resources.images',
               ],
     include_package_data=True,

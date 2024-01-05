@@ -25,6 +25,7 @@ from wx import NewIdRef as wxNewIdRef
 from wx.lib.sized_controls import SizedFrame
 from wx.lib.sized_controls import SizedStaticBox
 
+from visualdependencies.dialogs.AboutDialog import AboutDialog
 from visualdependencies.dialogs.PreferencesDialog import PreferencesDialog
 
 
@@ -130,4 +131,7 @@ class AppTestDialogFrame(SizedFrame):
 
     def testDialogAbout(self) -> Any:
 
-        return 'Under Construction'
+        with AboutDialog(self) as dlg:
+            dlg.ShowModal()
+
+        return 'Ok'
