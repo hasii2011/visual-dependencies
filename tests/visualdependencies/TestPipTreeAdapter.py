@@ -2,6 +2,8 @@
 from unittest import TestSuite
 from unittest import main as unitTestMain
 
+from os import environ as osEnvironment
+
 from codeallybasic.UnitTestBase import UnitTestBase
 
 from visualdependencies.PipTreeAdapter import PackageName
@@ -15,6 +17,11 @@ from visualdependencies.model.TypesV2 import Packages
 
 PACKAGE_NAME:    str = 'click'
 PACKAGE_VERSION: str = '8.1.7'
+
+CI_PYENV_PATH:    str = '/home/circleci/.pyenv/versions/3.11.7/lib/python3.11/site-packages'
+LOCAL_PYENV_PATH: str = '/Users/humberto.a.sanchez.ii/PycharmProjects/pytrek/pyenv-3.10.13/lib/python3.10/site-packages'
+
+ENV_CIRCLECI: str = 'CIRCLECI'
 
 
 class TestPipTreeAdapter(UnitTestBase):
@@ -30,29 +37,36 @@ class TestPipTreeAdapter(UnitTestBase):
 
     def setUp(self):
         super().setUp()
+        try:
+            value:                 str = osEnvironment[ENV_CIRCLECI]
+            if value.lower() == 'true':
+                self._sitePackagePath: str = CI_PYENV_PATH
+            else:
+                self._sitePackagePath: str = LOCAL_PYENV_PATH
+
+        except KeyError:
+            self._sitePackagePath: str = LOCAL_PYENV_PATH
 
     def tearDown(self):
         super().tearDown()
 
     def testGetAllPackages(self):
 
-        sitePackagePath: str = '/Users/humberto.a.sanchez.ii/PycharmProjects/pytrek/pyenv-3.10.13/lib/python3.10/site-packages'
         pipTreeAdapter:  PipTreeAdapter = PipTreeAdapter()
 
-        packages: Packages = pipTreeAdapter.execute(packageNames=PackageNames([]), sitePackagePath=sitePackagePath)
+        packages: Packages = pipTreeAdapter.execute(packageNames=PackageNames([]), sitePackagePath=self._sitePackagePath)
 
         self.assertTrue(len(packages) != 0, 'We should have something!!')
 
     def testFilterPackages(self):
 
-        sitePackagePath: str = '/Users/humberto.a.sanchez.ii/PycharmProjects/pytrek/pyenv-3.10.13/lib/python3.10/site-packages'
         pipTreeAdapter:  PipTreeAdapter = PipTreeAdapter()
 
         packageName:  PackageName  = PackageName('pip')
         packageNames: PackageNames = PackageNames([])
         packageNames.append(packageName)
 
-        packages: Packages = pipTreeAdapter.execute(packageNames=packageNames, sitePackagePath=sitePackagePath)
+        packages: Packages = pipTreeAdapter.execute(packageNames=packageNames, sitePackagePath=self._sitePackagePath)
 
         self.assertTrue(len(packages) == 1, 'We only wanted 1 !!!')
 
