@@ -65,8 +65,6 @@ setup(
     install_requires=['codeallybasic~=0.5.2',
                       'wxPython==4.2.1',
                       'chardet==5.2.0',
-                      'pipdeptree==2.13.1',
-                      'dataclass-wizard==0.22.2',
                       'pip-tree==3.2.0',
                       ]
 )

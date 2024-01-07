@@ -94,8 +94,8 @@ class ApplicationFrame (SizedFrame):
         tree.SetImageList(imageList)
 
         tree.AddColumn("Package")
-        tree.AddColumn("Installed")
-        tree.AddColumn("Required")
+        tree.AddColumn("Version")
+        tree.AddColumn("Updated")
         tree.SetMainColumn(0)  # the one with the tree in it...
         tree.SetColumnWidth(column=0, width=175)
 

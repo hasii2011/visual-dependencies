@@ -16,7 +16,7 @@ The basic command structure is:
 
 # Installation
 
-```pip install visual-dependencies```
+``Extract the signed OS binary from the latest release```
 
 
 ___
