@@ -17,6 +17,5 @@ py2app==0.28.6
 buildlackey==1.6.2
 codeallybasic==0.5.2
 
-pipdeptree==2.13.1
-dataclass-wizard==0.22.2
+pip-tree==3.2.0
 wxPython==4.2.1

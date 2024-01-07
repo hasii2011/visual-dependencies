@@ -35,6 +35,7 @@ jobs:
             pip install html-testRunner==1.2.1
             pip install buildlackey~=1.6.2
             pip install pipdeptree==2.13.1
+            pip install pip-tree==3.2.0
             pip install dataclass-wizard==0.22.2
       - run:
             name: run tests

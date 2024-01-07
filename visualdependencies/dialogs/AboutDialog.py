@@ -21,8 +21,7 @@ from wx import Font
 from wx.lib.sized_controls import SizedDialog
 from wx.lib.sized_controls import SizedPanel
 
-from dataclass_wizard.__version__ import __version__ as dcWizardVersion
-from pipdeptree.version import __version__ as pipdeptreeVersion
+from pip_tree._version import __version__ as pipTreeVersion
 
 from visualdependencies import __version__
 from visualdependencies.resources.icons import AboutDialogImage
@@ -78,8 +77,7 @@ class AboutDialog(SizedDialog):
             f'Python:           {pythonVersion.split(" ")[0]}\n'
             f'wxPython:         {wxVersion}\n'
             f'Py2App:           0.28.6\n'
-            f'pipdeptree:       {pipdeptreeVersion}\n'
-            f'Dataclass Wizard: {dcWizardVersion}'
+            f'pip_tree:         {pipTreeVersion}'
         )
 
         versionFont: Font = Font(12, FONTFAMILY_TELETYPE, FONTSTYLE_NORMAL, FONTWEIGHT_BOLD)

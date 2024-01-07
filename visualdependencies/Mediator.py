@@ -10,31 +10,28 @@ from pathlib import Path
 
 from dataclasses import dataclass
 
-from dataclass_wizard import Container
-
-from wx import FD_CHANGE_DIR
-from wx import FD_FILE_MUST_EXIST
-from wx import FD_NO_FOLLOW
-from wx import FD_OPEN
+from wx import DD_DEFAULT_STYLE
+from wx import DD_DIR_MUST_EXIST
 from wx import ICON_ERROR
 from wx import TreeItemIcon_Expanded
 from wx import TreeItemIcon_Normal
 from wx import OK
 
-from wx import FileSelector
+from wx import DirSelector
 from wx import MessageDialog
 
 from wx.lib.gizmos import TreeListCtrl
+
 from wx.dataview import TreeListItem
 
-from visualdependencies.CLIAdapter import CLIAdapter
-from visualdependencies.CLIAdapter import CLIException
-from visualdependencies.CLIAdapter import PackageNames
-
 from visualdependencies.EnhancedImageList import EnhancedImageList
+from visualdependencies.PipTreeAdapter import PackageNames
+from visualdependencies.PipTreeAdapter import PipTreeAdapter
 from visualdependencies.Preferences import Preferences
-from visualdependencies.model.Types import Dependency
-from visualdependencies.model.Types import Package
+from visualdependencies.model.TypesV2 import Dependency
+from visualdependencies.model.TypesV2 import Package
+
+from visualdependencies.model.TypesV2 import Packages
 
 
 @dataclass
@@ -43,7 +40,7 @@ class InterpreterRequestResponse:
     interpreterName: str  = ''
 
 
-PYTHON_INTERPRETER: str = 'python*'
+SITE_PACKAGES_DIRECTORY_NAME: str = 'site-packages'
 
 
 class Mediator:
@@ -60,8 +57,8 @@ class Mediator:
         self._treeRoot:          TreeListItem      = treeRoot
         self._enhancedImageList: EnhancedImageList = enhancedImageList
 
-        self._cliAdapter:  CLIAdapter  = CLIAdapter()
-        self._preferences: Preferences = Preferences()
+        self._pipTreeAdapter: PipTreeAdapter = PipTreeAdapter()
+        self._preferences:    Preferences    = Preferences()
 
     def selectVirtualEnvironment(self):
 
@@ -71,31 +68,23 @@ class Mediator:
         if response.cancelled is True:
             pass        # Now what
         else:
-            interpreter: str = response.interpreterName
-            try:
-                self._cliAdapter.execute(packageNames=PackageNames([]), interpreter=interpreter)
-            except CLIException as ce:
-                self.logger.error(f'{ce}  {self._cliAdapter.stderr}')
-                booBoo: MessageDialog = MessageDialog(parent=None,
-                                                      message=self._cliAdapter.stderr,
-                                                      caption='Oops', style=OK | ICON_ERROR)
-                booBoo.ShowModal()
+            interpreter: str      = response.interpreterName
+            packages:    Packages = self._pipTreeAdapter.execute(packageNames=PackageNames([]), sitePackagePath=interpreter)
 
-            container: Container = Package.from_json(self._cliAdapter.json)
-            self._displayDependencies(container=container)
+            self._displayDependencies(packages=packages)
 
-    def _displayDependencies(self, container: Container):
+    def _displayDependencies(self, packages: Packages):
 
         tree: TreeListCtrl = self.treeListCtrl
         root: TreeListItem = self._treeRoot
 
         enhancedImageList: EnhancedImageList = self._enhancedImageList
 
-        for pkg in container:
+        for pkg in packages:
             package: Package      = cast(Package, pkg)
-            pkgItem: TreeListItem = tree.AppendItem(root, package.package.packageName)
+            pkgItem: TreeListItem = tree.AppendItem(root, package.information.packageName)
 
-            tree.SetItemText(pkgItem, package.package.installedVersion, 1)
+            tree.SetItemText(pkgItem, package.information.version, 1)
 
             tree.SetItemImage(pkgItem, enhancedImageList.folderIndex,     which=TreeItemIcon_Normal)
             tree.SetItemImage(pkgItem, enhancedImageList.folderOpenIndex, which=TreeItemIcon_Expanded)
@@ -104,10 +93,10 @@ class Mediator:
                 dependency: Dependency   = cast(Dependency, dep)
                 depItem:    TreeListItem = tree.AppendItem(pkgItem, dependency.packageName)
 
-                tree.SetItemText(depItem, dependency.installedVersion, 1)
-                if dependency.requiredVersion == '':
-                    dependency.requiredVersion = 'None'
-                tree.SetItemText(depItem, dependency.requiredVersion, 2)
+                tree.SetItemText(depItem, dependency.version, 1)
+                if dependency.version == '':
+                    dependency.version = 'None'
+                tree.SetItemText(depItem, dependency.version, 2)
 
                 # tree.SetItemImage(depItem, enhancedImageList.fileIndex,       which=TreeItemIcon_Normal)
                 # tree.SetItemImage(depItem, enhancedImageList.folderOpenIndex, which=TreeItemIcon_Expanded)
@@ -134,35 +123,35 @@ class Mediator:
         if defaultDir is None:
             defaultDir = getcwd()
         while True:
-            file = FileSelector(
-                message="Choose a virtual environment",
+            dir = DirSelector(
+                message="Choose a virtual environment site packages",
                 default_path=defaultDir,
-                flags=FD_OPEN | FD_FILE_MUST_EXIST | FD_CHANGE_DIR | FD_NO_FOLLOW
+                style=DD_DIR_MUST_EXIST | DD_DEFAULT_STYLE
             )
 
             response: InterpreterRequestResponse = InterpreterRequestResponse()
-            if file == '':
+            if dir == '':
                 response.cancelled = True
                 response.interpreterName  = ''
                 break
             else:
-                if self._isItAnInterpreter(file) is True:
+                if self._isItTheSitePackagesDirectory(dir) is True:
                     response.cancelled = False
-                    response.interpreterName = file
+                    response.interpreterName = dir
                     break
                 else:
                     self._admonishDeveloper()
 
         return response
 
-    def _isItAnInterpreter(self, fqFileName: str) -> bool:
+    def _isItTheSitePackagesDirectory(self, fqFileName: str) -> bool:
         import fnmatch
 
         ans:      bool = False
         path:     Path = Path(fqFileName)
         fileName: str = path.name
 
-        if fnmatch.fnmatch(name=fileName, pat=PYTHON_INTERPRETER) is True:
+        if fnmatch.fnmatch(name=fileName, pat=SITE_PACKAGES_DIRECTORY_NAME) is True:
             ans = True
 
         return ans
@@ -170,9 +159,9 @@ class Mediator:
     def _admonishDeveloper(self):
         """
         I wish I could ask the file selector to let me specify a file like
-        PYTHON_INTERPRETER
+        SITE_PACKAGES_DIRECTORY_NAME
         """
-        booBoo: MessageDialog = MessageDialog(parent=None, message='You must select an interpreter',
+        booBoo: MessageDialog = MessageDialog(parent=None, message='You must select an sitePackagePath',
                                               caption='Try Again!',
                                               style=OK | ICON_ERROR)
         booBoo.ShowModal()

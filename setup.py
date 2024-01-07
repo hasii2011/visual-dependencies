@@ -67,5 +67,6 @@ setup(
                       'chardet==5.2.0',
                       'pipdeptree==2.13.1',
                       'dataclass-wizard==0.22.2',
+                      'pip-tree==3.2.0',
                       ]
 )
