@@ -31,7 +31,7 @@ class PreferencesDialog(SizedDialog):
     def __init__(self, parent):
 
         style:   int  = DEFAULT_DIALOG_STYLE
-        dlgSize: Size = Size(340, 240)
+        dlgSize: Size = Size(360, 270)
 
         super().__init__(parent, ID_ANY, "Preferences", size=dlgSize, style=style)
 
@@ -46,10 +46,12 @@ class PreferencesDialog(SizedDialog):
         self._directoryPicker:    DirPickerCtrl = cast(DirPickerCtrl, None)
         self._expandProject:      CheckBox      = cast(CheckBox, None)
         self._expandDependencies: CheckBox      = cast(CheckBox, None)
+        self._initialQuery:       CheckBox      = cast(CheckBox, None)
 
         self._directoryPickerId:    wxNewIdRef = wxNewIdRef()
         self._expandProjectId:      wxNewIdRef = wxNewIdRef()
         self._expandDependenciesId: wxNewIdRef = wxNewIdRef()
+        self._initialQueryId:       wxNewIdRef = wxNewIdRef()
 
         self._layoutControls(sizedPanel=sizedPanel)
         self._setControlValues()
@@ -59,6 +61,7 @@ class PreferencesDialog(SizedDialog):
         self.Bind(EVT_DIRPICKER_CHANGED, self._projectsBaseDirectoryChanged, id=self._directoryPickerId)
         self.Bind(EVT_CHECKBOX,          self._onExpandProjectChanged,       id=self._expandProjectId)
         self.Bind(EVT_CHECKBOX,          self._onExpandDependenciesChange,   id=self._expandDependenciesId)
+        self.Bind(EVT_CHECKBOX,          self._onInitialQueryChange,         id=self._initialQueryId)
 
     def _layoutControls(self, sizedPanel: SizedPanel):
         """
@@ -76,8 +79,9 @@ class PreferencesDialog(SizedDialog):
         directoryPicker.SetSizerProps(expand=True, proportion=1, valign='top')
 
         self._directoryPicker    = directoryPicker
-        self._expandProject      = CheckBox(sizedPanel, self._expandProjectId,      "Expand Project Requirements")
-        self._expandDependencies = CheckBox(sizedPanel, self._expandDependenciesId, "Expand Package Dependencies")
+        self._expandProject      = CheckBox(sizedPanel, self._expandProjectId,      'Expand Project Requirements')
+        self._expandDependencies = CheckBox(sizedPanel, self._expandDependenciesId, 'Expand Package Dependencies')
+        self._initialQuery       = CheckBox(sizedPanel, self._initialQueryId,       'Query on Startup')
 
     def _setControlValues(self):
 
@@ -85,6 +89,7 @@ class PreferencesDialog(SizedDialog):
         self._directoryPicker.SetInitialDirectory(self._preferences.projectsBaseDirectory)
         self._expandProject.SetValue(self._preferences.openProject)
         self._expandDependencies.SetValue(self._preferences.expandDependencies)
+        self._initialQuery.SetValue(self._preferences.initialQuery)
 
     def _projectsBaseDirectoryChanged(self, event: FileDirPickerEvent):
 
@@ -102,3 +107,9 @@ class PreferencesDialog(SizedDialog):
         newValue: bool = event.IsChecked()
 
         self._preferences.expandDependencies = newValue
+
+    def _onInitialQueryChange(self, event: CommandEvent):
+
+        newValue: bool = event.IsChecked()
+
+        self._preferences.initialQuery = newValue

@@ -42,10 +42,10 @@ class TestPipTreeAdapter(UnitTestBase):
             if value.lower() == 'true':
                 self._sitePackagePath: str = CI_PYENV_PATH
             else:
-                self._sitePackagePath: str = LOCAL_PYENV_PATH
+                self._sitePackagePath = LOCAL_PYENV_PATH
 
         except KeyError:
-            self._sitePackagePath: str = LOCAL_PYENV_PATH
+            self._sitePackagePath = LOCAL_PYENV_PATH
 
     def tearDown(self):
         super().tearDown()

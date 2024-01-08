@@ -25,11 +25,13 @@ DEBUG_PROJECTS_DIRECTORY: str = '/Users/humberto.a.sanchez.ii/PycharmProjects/'
 PROJECTS_BASE_DIRECTORY: str = 'projects_base_directory'
 OPEN_PROJECT:            str = 'open_project'
 EXPAND_DEPENDENCIES:     str = 'expand_dependencies'
+INITIAL_QUERY:           str = 'initial_query'
 
 PREFERENCES: PREFERENCES_NAME_VALUES = {
     PROJECTS_BASE_DIRECTORY: DEBUG_PROJECTS_DIRECTORY,
     OPEN_PROJECT:            'True',
     EXPAND_DEPENDENCIES:     'False',
+    INITIAL_QUERY:           'False'
 }
 
 
@@ -72,6 +74,15 @@ class Preferences:
     @expandDependencies.setter
     def expandDependencies(self, newValue: bool):
         self._config.set(section=PREFERENCES_SECTION, option=EXPAND_DEPENDENCIES, value=str(newValue))
+        self._savePreferences()
+
+    @property
+    def initialQuery(self) -> bool:
+        return self._config.getboolean(section=PREFERENCES_SECTION, option=INITIAL_QUERY)
+
+    @initialQuery.setter
+    def initialQuery(self, newValue: bool):
+        self._config.set(section=PREFERENCES_SECTION, option=INITIAL_QUERY, value=str(newValue))
         self._savePreferences()
 
     def _loadPreferences(self):
